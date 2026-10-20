@@ -13,6 +13,17 @@ async function apiJson<T>(path: string, signal?: AbortSignal): Promise<T> {
   return response.json() as Promise<T>;
 }
 const initialCities: City[] = [
+  { id: 'moscow', name: 'Москва', country: 'Россия', lat: 55.7558, lon: 37.6173, timezone: 'Europe/Moscow' },
+  { id: 'saint-petersburg', name: 'Санкт-Петербург', country: 'Россия', lat: 59.9343, lon: 30.3351, timezone: 'Europe/Moscow' },
+  { id: 'kazan', name: 'Казань', country: 'Россия', lat: 55.7961, lon: 49.1064, timezone: 'Europe/Moscow' },
+  { id: 'sochi', name: 'Сочи', country: 'Россия', lat: 43.6028, lon: 39.7342, timezone: 'Europe/Moscow' },
+  { id: 'yekaterinburg', name: 'Екатеринбург', country: 'Россия', lat: 56.8389, lon: 60.6057, timezone: 'Asia/Yekaterinburg' },
+  { id: 'novosibirsk', name: 'Новосибирск', country: 'Россия', lat: 55.0084, lon: 82.9357, timezone: 'Asia/Novosibirsk' },
+  { id: 'brussels', name: 'Брюссель', country: 'Бельгия', lat: 50.8503, lon: 4.3517, timezone: 'Europe/Brussels' },
+  { id: 'antwerp', name: 'Антверпен', country: 'Бельгия', lat: 51.2194, lon: 4.4025, timezone: 'Europe/Brussels' },
+  { id: 'ghent', name: 'Гент', country: 'Бельгия', lat: 51.0543, lon: 3.7174, timezone: 'Europe/Brussels' },
+  { id: 'bruges', name: 'Брюгге', country: 'Бельгия', lat: 51.2093, lon: 3.2247, timezone: 'Europe/Brussels' },
+  { id: 'liege', name: 'Льеж', country: 'Бельгия', lat: 50.6326, lon: 5.5797, timezone: 'Europe/Brussels' },
   { id: 'krakow', name: 'Краков', country: 'Польша', lat: 50.0647, lon: 19.945, timezone: 'Europe/Warsaw' },
   { id: 'warsaw', name: 'Варшава', country: 'Польша', lat: 52.2297, lon: 21.0122, timezone: 'Europe/Warsaw' },
   { id: 'paris', name: 'Париж', country: 'Франция', lat: 48.8566, lon: 2.3522, timezone: 'Europe/Paris' },

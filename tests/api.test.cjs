@@ -24,8 +24,8 @@ after(() => server?.kill());
 test('health, city catalog and explicit dependency injection', async () => {
   assert.deepEqual(await (await fetch(`${base}/api/health`)).json(), { ok: true });
   const cities = await (await fetch(`${base}/api/cities`)).json();
-  assert.equal(cities.length, 8);
-  assert.equal(cities[0].name, 'Краков');
+  assert.equal(cities.length, 19);
+  assert.equal(cities.find(city => city.id === 'krakow').name, 'Краков');
   const cameras = await (await fetch(`${base}/api/cameras/krakow`)).json();
   if (process.env.TEST_CAMERAS) {
     assert.equal(cameras.status, 'ok');
