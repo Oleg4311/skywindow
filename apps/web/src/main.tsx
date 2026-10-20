@@ -2,9 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Activity, ArrowUpRight, Camera, ChevronDown, Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudRain, CloudSnow, CloudSun, Compass, Droplets, ExternalLink, Eye, Globe2, LocateFixed, MapPin, Search, Sun, Sunrise, Sunset, Thermometer, Video, Wind } from 'lucide-react';
 import './styles.css';
+import { loadWeather, type City, type Weather } from './weather';
 
-type City = { id: string; name: string; country: string; lat: number; lon: number; timezone: string };
-type Weather = { city: City; current: { temperature_2m: number; relative_humidity_2m: number; apparent_temperature: number; precipitation: number; weather_code: number; cloud_cover: number; wind_speed_10m: number; wind_direction_10m: number; is_day: number; time: string }; daily: { time: string[]; weather_code: number[]; temperature_2m_max: number[]; temperature_2m_min: number[]; sunrise: string[]; sunset: string[]; precipitation_probability_max: number[] }; updatedAt: string };
 type Webcam = { id: string; title: string; preview: string | null; player: string | null; url: string | null; location: string };
 type Cameras = { status: 'ok' | 'configuration_required' | 'provider_error'; cameras: Webcam[]; message: string | null };
 const API = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
@@ -55,11 +54,11 @@ function App() {
     const fetchAll = async () => {
       setPending(true); setError('');
       const [weatherResult, cameraResult] = await Promise.allSettled([
-        apiJson<Weather>(`weather/${cityId}`, controller.signal),
+        loadWeather(city, () => apiJson<Weather>(`weather/${cityId}`, controller.signal), controller.signal),
         apiJson<Cameras>(`cameras/${cityId}`, controller.signal)
       ]);
       if (!active) return;
-      if (weatherResult.status === 'fulfilled') setWeather(weatherResult.value); else { setWeather(null); setError('Не удалось загрузить погоду. Проверьте соединение с API.'); }
+      if (weatherResult.status === 'fulfilled') setWeather(weatherResult.value); else { setWeather(null); setError('Не удалось получить погоду ни через сервер, ни напрямую. Попробуйте ещё раз через минуту.'); }
       if (cameraResult.status === 'fulfilled') setCameras(cameraResult.value); else setCameras({ status: 'provider_error', cameras: [], message: 'Не удалось получить список камер.' });
       setPending(false);
     };

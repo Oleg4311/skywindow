@@ -12,6 +12,10 @@ services:
       - key: NODE_ENV
         value: production
       - key: WEB_ORIGIN
-        value: https://oleg4311.github.io
+        value: https://skywindow.onrender.com
+      - key: VITE_API_URL
+        value: ''
+      - key: VITE_BASE_PATH
+        value: /
       - key: WINDY_WEBCAMS_API_KEY
         sync: false

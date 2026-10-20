@@ -38,7 +38,7 @@ async function getJson(url: string, headers: Record<string, string> = {}) {
   const timeout = setTimeout(() => controller.abort(), 9000);
   try {
     const response = await fetch(url, { headers, signal: controller.signal });
-    if (!response.ok) throw new Error(`Upstream returned ${response.status}`);
+    if (!response.ok) throw new Error(`Upstream returned ${response.status}: ${(await response.text()).slice(0, 300)}`);
     return await response.json() as any;
   } finally { clearTimeout(timeout); }
 }
@@ -56,7 +56,10 @@ class DashboardService {
       try {
         const data = await getJson(`https://api.open-meteo.com/v1/forecast?${params}`);
         return { city, current: data.current, daily: data.daily, units: data.current_units, updatedAt: new Date().toISOString() };
-      } catch { throw new ServiceUnavailableException('Сервис погоды временно недоступен'); }
+      } catch (error) {
+        console.error(`Weather request failed for ${city.id}:`, error instanceof Error ? error.message : 'Unknown upstream error');
+        throw new ServiceUnavailableException('Сервис погоды временно недоступен');
+      }
     });
   }
 

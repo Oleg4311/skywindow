@@ -1,5 +1,10 @@
 # SkyWindow
 
+**Развёрнутое приложение: [skywindow.onrender.com](https://skywindow.onrender.com/)**
+
+Фронтенд React и API NestJS работают вместе на одном сервисе Render.
+GitHub Pages для этого развёртывания не нужен.
+
 Погода и веб-камеры восьми городов: React + TypeScript + Vite и NestJS.
 Прогноз на пять дней, местное время, поиск города и камеры в радиусе 30 км.
 Обновление данных каждые пять минут. Источники: Open-Meteo и Windy Webcams API v3.
@@ -44,43 +49,52 @@ Open-Meteo для этого приложения отдельного ключ�
 Для своего сценария проверьте [условия Windy](https://api4.windy.com/webcams/terms)
 и [Open-Meteo](https://open-meteo.com/en/terms).
 
-## Развёртывание через GitHub
+## Развёртывание на Render из GitHub
 
-[GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)
-размещает статические файлы. NestJS требует отдельного сервера:
-фронтенд публикуется на GitHub Pages, API с ключом — на Render.
-В репозитории подготовлены GitHub Actions и `render.yaml`.
+Render собирает обе части проекта и запускает NestJS, который обслуживает
+`/api/*` и готовый фронтенд. Запросы идут на тот же домен, отдельный адрес API
+для браузера и настройка GitHub Pages не требуются. Конфигурация — `render.yaml`.
 
-### 1. Запустите API на Render
+### Создание сервиса
 
 1. Войдите в [Render](https://dashboard.render.com/) через GitHub.
 2. **New → Blueprint**: выберите `Oleg4311/skywindow`, ветку `main`.
 3. Render прочитает `render.yaml`. Введите `WINDY_WEBCAMS_API_KEY`.
-4. Проверьте `WEB_ORIGIN=https://oleg4311.github.io` — без `/skywindow/` и завершающего `/`.
+4. Оставьте `VITE_API_URL` пустым и `VITE_BASE_PATH=/`.
+   `WEB_ORIGIN` задайте равным адресу сервиса, например `https://skywindow.onrender.com`.
 5. Создайте сервис и дождитесь успешной сборки. Скопируйте HTTPS URL,
    например `https://skywindow-xxxx.onrender.com`.
 6. Откройте `<URL>/api/health`: ожидается `{"ok":true}`.
-   `<URL>/api/weather/krakow` возвращает погоду,
+   `<URL>/api/weather/krakow` возвращает погоду при доступном серверном Open-Meteo,
    `<URL>/api/cameras/krakow` — статус `ok` при рабочем ключе.
 
-Сервис также отдаёт сайт по адресу Render. Бесплатный сервис может засыпать;
+Откройте адрес сервиса: это и есть готовый сайт. Бесплатный сервис может засыпать;
 после пробуждения обновите страницу или нажмите «Повторить».
 Актуальные условия смотрите в [документации Render](https://render.com/docs/web-services).
 
-### 2. Опубликуйте фронтенд на GitHub Pages
+### Обновление приложения
 
-1. В [репозитории](https://github.com/Oleg4311/skywindow) откройте **Settings → Pages**.
-2. **Build and deployment → Source → GitHub Actions**.
-3. **Settings → Secrets and variables → Actions → Variables → New repository variable**:
-   имя `VITE_API_URL`, значение — HTTPS URL Render без `/api`.
-   Например `https://skywindow-xxxx.onrender.com`. Это публичный адрес, не ключ.
-4. **Actions → Deploy GitHub Pages → Run workflow → main**.
-5. После успешной публикации откройте **https://oleg4311.github.io/skywindow/**.
+При включённом **Auto Deploy** Render пересобирает приложение после push в `main`.
+Вручную: сервис → **Manual Deploy → Deploy latest commit**.
+После изменения `VITE_*` нужна новая сборка, поскольку Vite подставляет их при сборке.
 
-Следующие push в `main` автоматически проверяют проект и публикуют фронтенд.
-До добавления `VITE_API_URL` публикация пропускается. При смене URL перезапустите workflow:
-Vite подставляет его при сборке. Для другого владельца измените `WEB_ORIGIN` на Render.
-Для собственного домена установите `VITE_BASE_PATH: /` в workflow.
+Workflow GitHub Pages оставлен как необязательный вариант отдельного размещения
+фронтенда. Для текущего сайта его запускать не требуется.
+
+### Если погода не загружается
+
+Браузер сначала обращается к `/api/weather/:id`. Если серверный запрос не удался,
+он получает тот же прогноз напрямую из публичного Open-Meteo без ключа.
+Это помогает при ограничении общего IP хостинга. Если не работают оба пути,
+интерфейс показывает ошибку и кнопку повторной загрузки.
+Камеры по-прежнему запрашиваются сервером: ключ Windy не передаётся в браузер.
+
+`/api/health` проверяет запуск приложения, но не доступность внешних сервисов.
+При HTTP 503 на `/api/weather/:id` смотрите **Render → Logs**:
+там записываются город, код ответа Open-Meteo и причина ошибки.
+Open-Meteo [предупреждает](https://open-meteo.com/en/terms), что на общих IP Render
+ограничение запросов может наступать раньше ожидаемого. Это возможная причина,
+а не подтверждённый диагноз без серверных логов.
 
 ## Переменные и API
 
