@@ -1,0 +1,22 @@
+{
+  "name": "skywindow",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k \"npm run dev -w @skywindow/api\" \"npm run dev -w @skywindow/web\"",
+    "build": "npm run build -w @skywindow/api && npm run build -w @skywindow/web",
+    "typecheck": "npm run typecheck --workspaces",
+    "start": "npm run start -w @skywindow/api",
+    "test": "node --test tests/*.test.cjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
